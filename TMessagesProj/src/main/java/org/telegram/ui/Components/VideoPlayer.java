@@ -70,6 +70,9 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
+import com.google.android.exoplayer2.text.Cue;
+import com.google.android.exoplayer2.text.CueGroup;
+import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.video.SurfaceNotValidException;
@@ -104,6 +107,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.function.Consumer;
 
 import tw.nekomimi.nekogram.NekoConfig;
@@ -168,6 +172,8 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
 
     private VideoPlayerDelegate delegate;
     private AudioVisualizerDelegate audioVisualizerDelegate;
+    @Nullable
+    private TextOutput textOutput;
     private int lastReportedPlaybackState;
     private boolean lastReportedPlayWhenReady;
 
@@ -1594,6 +1600,27 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
 
     public void setDelegate(VideoPlayerDelegate videoPlayerDelegate) {
         delegate = videoPlayerDelegate;
+    }
+
+    public void setTextOutput(@Nullable TextOutput output) {
+        textOutput = output;
+        if (textOutput != null) {
+            textOutput.onCues(CueGroup.EMPTY_TIME_ZERO);
+        }
+    }
+
+    @Override
+    public void onCues(List<Cue> cues) {
+        if (textOutput != null) {
+            textOutput.onCues(cues);
+        }
+    }
+
+    @Override
+    public void onCues(CueGroup cueGroup) {
+        if (textOutput != null) {
+            textOutput.onCues(cueGroup);
+        }
     }
 
     public void setAudioVisualizerDelegate(AudioVisualizerDelegate audioVisualizerDelegate) {

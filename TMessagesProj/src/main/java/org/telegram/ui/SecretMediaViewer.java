@@ -105,6 +105,7 @@ import org.telegram.ui.Components.TimerParticles;
 import org.telegram.ui.Components.TranslateAlert2;
 import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.Components.VideoPlayerSeekBar;
+import org.telegram.ui.Components.VideoSubtitleView;
 import org.telegram.ui.Stories.DarkThemeResourceProvider;
 import org.telegram.ui.Stories.recorder.HintView2;
 
@@ -345,6 +346,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
     private long currentDialogId;
     private AspectRatioFrameLayout aspectRatioFrameLayout;
     private TextureView videoTextureView;
+    private VideoSubtitleView videoSubtitleView;
     private VideoPlayer videoPlayer;
     private boolean isPlaying;
     private ActionBar actionBar;
@@ -540,6 +542,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             videoTextureView = new TextureView(parentActivity);
             videoTextureView.setOpaque(false);
             aspectRatioFrameLayout.addView(videoTextureView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+            videoSubtitleView = new VideoSubtitleView(parentActivity);
+            aspectRatioFrameLayout.addView(videoSubtitleView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 16, 0, 16, 48));
         }
         textureUploaded = false;
         videoCrossfadeStarted = false;
@@ -566,6 +570,9 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 }
             };
             videoPlayer.setTextureView(videoTextureView);
+            if (videoSubtitleView != null) {
+                videoPlayer.setTextOutput(videoSubtitleView);
+            }
             videoPlayer.setDelegate(new VideoPlayer.VideoPlayerDelegate() {
                 @Override
                 public void onStateChanged(boolean playWhenReady, int playbackState) {
@@ -708,6 +715,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
     private void releasePlayer() {
         if (videoPlayer != null) {
             playerRetryPlayCount = 0;
+            videoPlayer.setTextOutput(null);
             videoPlayer.releasePlayer(true);
             videoPlayer = null;
         }

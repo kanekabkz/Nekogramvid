@@ -292,6 +292,7 @@ import org.telegram.ui.Components.VideoEditTextureView;
 import org.telegram.ui.Components.VideoForwardDrawable;
 import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.Components.VideoPlayerSeekBar;
+import org.telegram.ui.Components.VideoSubtitleView;
 import org.telegram.ui.Components.VideoSeekPreviewImage;
 import org.telegram.ui.Components.VideoTimelinePlayView;
 import org.telegram.ui.Components.ViewHelper;
@@ -996,6 +997,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private AnimatorSet flashAnimator;
     private TextureView videoTextureView;
     private SurfaceView videoSurfaceView;
+    private VideoSubtitleView videoSubtitleView;
     private boolean usedSurfaceView;
     private FirstFrameView firstFrameView;
     private VideoPlayer videoPlayer;
@@ -10406,6 +10408,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             } else if (videoSurfaceView != null) {
                 videoPlayer.setSurfaceView(videoSurfaceView);
             }
+            if (videoSubtitleView != null) {
+                videoPlayer.setTextOutput(videoSubtitleView);
+            }
 
             if (firstFrameView != null) {
                 firstFrameView.clear();
@@ -10835,6 +10840,13 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             flashView.setAlpha(0.0f);
             aspectRatioFrameLayout.addView(flashView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
         }
+        if (videoSubtitleView == null) {
+            videoSubtitleView = new VideoSubtitleView(parentActivity);
+        }
+        aspectRatioFrameLayout.addView(videoSubtitleView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 16, 0, 16, 48));
+        if (videoPlayer != null) {
+            videoPlayer.setTextOutput(videoSubtitleView);
+        }
         if (pipSource != null) {
             pipSource.setContentView(aspectRatioFrameLayout);
             pipSource.setPlaceholderView(pipPlaceholderView);
@@ -10858,6 +10870,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     currentMessageObject.cachedSavedTimestamp = progress;
                 }
             }
+            videoPlayer.setTextOutput(null);
             videoPlayer.releasePlayer(true);
             videoPlayer = null;
         } else {
